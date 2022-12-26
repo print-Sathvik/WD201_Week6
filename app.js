@@ -4,6 +4,15 @@ const app = express();
 const { Todo, User } = require("./models");
 const bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
+
+const passport = require("passport");
+const connectEnsureLogin = require("connect-ensure-login");
+const session = require("express-session");
+const LocalStrategy = require("passport-local");
+const bcrypt = require("bcrypt");
+
+const saltRounds = 10;
+
 app.use(bodyParser.json());
 const path = require("path");
 // eslint-disable-next-line no-unused-vars
@@ -18,17 +27,74 @@ app.set("view engine", "ejs");
 //Location of static html and CSS files to render our application
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/", async (request, response) => {
-  const allTodos = await Todo.getTodos();
-  if (request.accepts("html")) {
-    response.render("index", {
-      allTodos,
-      csrfToken: request.csrfToken(),
-    });
-  } else {
-    response.json({ allTodos });
-  }
+app.use(
+  session({
+    secret: "secret-key for session 123abc",
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000, //in milli seconds
+    },
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+    },
+    (username, password, done) => {
+      User.findOne({ where: { email: username } })
+        .then((user) => {
+          return done(null, user);
+        })
+        .catch((error) => {
+          return error;
+        });
+    }
+  )
+);
+
+passport.serializeUser((user, done) => {
+  console.log("Serialising user in session", user.id);
+  done(null, user.id);
 });
+
+passport.deserializeUser((id, done) => {
+  User.findByPk(id)
+    .then((user) => {
+      done(null, user);
+    })
+    .catch((error) => {
+      done(error, null);
+    });
+});
+
+app.get("/", async (request, response) => {
+  response.render("index", {
+    title: "Todo Application",
+    csrfToken: request.csrfToken(),
+  });
+});
+
+app.get(
+  "/todos",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const allTodos = await Todo.getTodos();
+    if (request.accepts("html")) {
+      response.render("todo", {
+        title: "Todo Application",
+        allTodos,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.json({ allTodos });
+    }
+  }
+);
 
 app.get("/signup", async (request, response) => {
   response.render("signup", {
@@ -38,21 +104,27 @@ app.get("/signup", async (request, response) => {
 });
 
 app.post("/users", async (request, response) => {
+  const hashedPassword = await bcrypt.hash(request.body.password, saltRounds);
+  console.log(hashedPassword);
   try {
-    // eslint-disable-next-line no-unused-vars
     const user = await User.create({
       firstName: request.body.firstName,
       lastName: request.body.lastName,
       email: request.body.email,
-      password: request.body.password,
+      password: hashedPassword,
     });
-    response.redirect("/");
+    request.login(user, (err) => {
+      if (err) {
+        console.log(err);
+      }
+      response.redirect("/todos");
+    });
   } catch (error) {
     console.log(error);
   }
 });
 
-app.get("/todos", async function (request, response) {
+/*app.get("/todos", async function (request, response) {
   console.log("Processing list of all Todos ...");
   // FILL IN YOUR CODE HERE
 
@@ -66,7 +138,7 @@ app.get("/todos", async function (request, response) {
     console.log(error);
     return response.status(422).json(error);
   }
-});
+});*/
 
 app.get("/todos/:id", async function (request, response) {
   try {
