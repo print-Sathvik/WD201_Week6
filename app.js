@@ -1,11 +1,13 @@
 const express = require("express");
 var csrf = require("tiny-csrf");
 const app = express();
-const { Todo } = require("./models");
+const { Todo, User } = require("./models");
 const bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
 app.use(bodyParser.json());
 const path = require("path");
+// eslint-disable-next-line no-unused-vars
+const { response } = require("express");
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser("A secret string"));
 app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
@@ -25,6 +27,28 @@ app.get("/", async (request, response) => {
     });
   } else {
     response.json({ allTodos });
+  }
+});
+
+app.get("/signup", async (request, response) => {
+  response.render("signup", {
+    title: "Signup",
+    csrfToken: request.csrfToken(),
+  });
+});
+
+app.post("/users", async (request, response) => {
+  try {
+    // eslint-disable-next-line no-unused-vars
+    const user = await User.create({
+      firstName: request.body.firstName,
+      lastName: request.body.lastName,
+      email: request.body.email,
+      password: request.body.password,
+    });
+    response.redirect("/");
+  } catch (error) {
+    console.log(error);
   }
 });
 
