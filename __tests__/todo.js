@@ -1,7 +1,6 @@
 const request = require("supertest");
 var cheerio = require("cheerio");
 const db = require("../models/index");
-// eslint-disable-next-line no-unused-vars
 const { Todo } = require("../models");
 const app = require("../app");
 
@@ -96,7 +95,7 @@ describe("Todo Application", function () {
     //****************************************
     //Note: Instead of getting all the todos and
     //finding the last inserted todo like in the video,
-    //I read the ID of todo which was last inserted in line 54-55
+    //I read the ID of todo which was last inserted in line 90-91
     //and checked its status below which has same outcome
     //******************************************
 
@@ -143,7 +142,7 @@ describe("Todo Application", function () {
     //****************************************
     //Note: Instead of getting all the todos and
     //finding the last inserted todo like in the video,
-    //I read the ID of todo which was last inserted in line 96-97
+    //I read the ID of todo which was last inserted in line 139-140
     //and checked its success status below which has same outcome
     //******************************************
 
