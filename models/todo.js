@@ -16,8 +16,13 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
-    static async addTodo(params) {
-      return await Todo.create(params);
+    static async addTodo({ title, dueDate, userId }) {
+      return await Todo.create({
+        title: title,
+        dueDate: dueDate,
+        completed: false,
+        userId,
+      });
     }
 
     static getTodos() {
@@ -54,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
       console.log(dueLaterStr);
     }
 
-    static async overdue() {
+    static async overdue(userId) {
       // FILL IN HERE TO RETURN OVERDUE ITEMS
       let today = new Date().toLocaleDateString("en-CA");
       const overdueTodos = await Todo.findAll({
@@ -62,25 +67,29 @@ module.exports = (sequelize, DataTypes) => {
           dueDate: {
             [Op.lt]: today,
           },
+          userId,
+          completed: false,
         },
         order: [["id", "ASC"]],
       });
       return overdueTodos;
     }
 
-    static async dueToday() {
+    static async dueToday(userId) {
       // FILL IN HERE TO RETURN ITEMS DUE tODAY
       let today = new Date().toLocaleDateString("en-CA");
       const dueTodayTodos = await Todo.findAll({
         where: {
           dueDate: today,
+          userId,
+          completed: false,
         },
         order: [["id", "ASC"]],
       });
       return dueTodayTodos;
     }
 
-    static async dueLater() {
+    static async dueLater(userId) {
       // FILL IN HERE TO RETURN ITEMS DUE LATER
       let today = new Date().toLocaleDateString("en-CA");
       const dueLaterTodos = await Todo.findAll({
@@ -88,22 +97,21 @@ module.exports = (sequelize, DataTypes) => {
           dueDate: {
             [Op.gt]: today,
           },
+          userId,
+          completed: false,
         },
         order: [["id", "ASC"]],
       });
       return dueLaterTodos;
     }
 
-    markAsCompleted() {
-      // FILL IN HERE TO MARK AN ITEM AS COMPLETE
-      return Todo.update(
-        { completed: true },
-        {
-          where: {
-            id: this.id,
-          },
-        }
-      );
+    static async completed(userId) {
+      return this.findAll({
+        where: {
+          completed: true,
+          userId,
+        },
+      });
     }
 
     setCompletionStatus(checkStatus) {
@@ -117,10 +125,11 @@ module.exports = (sequelize, DataTypes) => {
       );
     }
 
-    static async remove(id) {
+    static async remove(id, userId) {
       return this.destroy({
         where: {
           id,
+          userId,
         },
       });
     }

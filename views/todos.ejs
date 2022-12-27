@@ -1,103 +1,19 @@
 <div class="flex gap-2 py-4">
-    <h5>Overdue</h5>
-    <h3 id="count-overdue" class="bg-gray-300 px-4"></h3>
+    <h5><%= title %></h5>
+    <h3 id="count-overdue" class="bg-gray-300 px-4"><%= todos.length %></h3>
 </div>
 <ul class="list-none">
-    <% let countOverdue = 0;
-    for(var i=0; i < allTodos.length; i++) {
-        if(allTodos[i].dueDate < new Date().toLocaleDateString("en-CA") && !allTodos[i].completed)
-        {
-        countOverdue++; %>
+    <% for(var i=0; i < todos.length; i++) { %>
         <li  class="Todo-Item">
             <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
-                <input id="todo-checkbox-<%=allTodos[i].id%>" type="checkbox" <%=allTodos[i].completed ? "checked" : "" %> onclick="updateTodo(<%=allTodos[i].id%>)" class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300">
-                <label for="todo-checkbox-<%=allTodos[i].id%>" class="ml-2 text-sm text-gray-600 cursor-pointer"><%= allTodos[i].title%> <%= allTodos[i].dueDate%></label>
-                <a href="#" class="hidden trash-icon ml-2" onclick="deleteTodo(<%=allTodos[i].id%>)">
+                <input id="todo-checkbox-<%=todos[i].id%>" type="checkbox" <%=todos[i].completed ? "checked" : "" %> onclick="updateTodo(<%=todos[i].id%>)" class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300">
+                <label for="todo-checkbox-<%=todos[i].id%>" class="ml-2 text-sm text-gray-600 cursor-pointer"><%= todos[i].title%> <%= todos[i].dueDate%></label>
+                <a href="#" class="hidden trash-icon ml-2" onclick="deleteTodo(<%=todos[i].id%>)">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                     </svg>
                 </a>
             </div>
         </li> 
-        <% } %>
     <% } %>
-    <script>document.getElementById("count-overdue").innerHTML = <%=countOverdue%></script>
-</ul>
-
-<div class="flex gap-2 py-4">
-    <h5>Due Today</h5>
-    <h3 id="count-due-today" class="bg-gray-300 px-4">5</h3>
-</div>
-<ul class="list-none">
-    <% let countdueToday = 0;
-    for(var i=0; i < allTodos.length; i++) {
-        if(allTodos[i].dueDate == new Date().toLocaleDateString("en-CA") && !allTodos[i].completed)
-        {
-        countdueToday++ ; %>
-        <li class="Todo-Item">
-            <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
-                <input id="todo-checkbox-<%=allTodos[i].id%>" type="checkbox" <%=allTodos[i].completed ? "checked" : "" %> onclick="updateTodo(<%=allTodos[i].id%>)" class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300">
-                <label for="todo-checkbox-<%=allTodos[i].id%>" class="ml-2 text-sm text-gray-600 cursor-pointer"><%= allTodos[i].title%> <%= allTodos[i].dueDate%></label>
-                <a href="#" class="hidden trash-icon ml-2" onclick="deleteTodo(<%=allTodos[i].id%>)">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                    </svg>
-                </a>
-            </div>
-        </li>
-        <% } %>
-    <% } %>
-    <script>document.getElementById("count-due-today").innerHTML = <%=countdueToday%></script>
-</ul>
-
-<div class="flex gap-2 py-4">
-    <h5>Due Later</h5>
-    <h3 id="count-due-later" class="bg-gray-300 px-4">5</h3>
-</div>
-<ul class="list-none">
-    <% let countdueLater = 0;
-    for(var i=0; i < allTodos.length; i++) {
-        if(allTodos[i].dueDate > new Date().toLocaleDateString("en-CA") && !allTodos[i].completed)
-        {
-            countdueLater++; %>
-        <li  class="Todo-Item">
-            <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
-                <input id="todo-checkbox-<%=allTodos[i].id%>" type="checkbox" <%=allTodos[i].completed ? "checked" : "" %> onclick="updateTodo(<%=allTodos[i].id%>)" class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300">
-                <label for="todo-checkbox-<%=allTodos[i].id%>" class="ml-2 text-sm text-gray-600 cursor-pointer"><%= allTodos[i].title%> <%= allTodos[i].dueDate%></label>
-                <a href="#" class="hidden trash-icon ml-2" onclick="deleteTodo(<%=allTodos[i].id%>)">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                    </svg>
-                </a>
-            </div>
-        </li>
-        <% } %>
-    <% } %>
-    <script>document.getElementById("count-due-later").innerHTML = <%=countdueLater%></script>
-</ul>
-
-<div class="flex gap-2 py-4">
-    <h5>Completed items</h5>
-    <h3 id="count-completed" class="bg-gray-300 px-4"></h3>
-</div>
-<ul class="list-none">
-    <% let countCompleted = 0;
-    for(var i=0; i < allTodos.length; i++) {
-        if(allTodos[i].completed)
-        {
-        countCompleted++; %>
-        <li  class="Todo-Item">
-            <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
-                <input id="todo-checkbox-<%=allTodos[i].id%>" type="checkbox" <%=allTodos[i].completed ? "checked" : "" %> onclick="updateTodo(<%=allTodos[i].id%>)" class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300">
-                <label for="todo-checkbox-<%=allTodos[i].id%>" class="ml-2 text-sm text-gray-600 cursor-pointer"><%= allTodos[i].title%> <%= allTodos[i].dueDate%></label>
-                <a href="#" class="hidden trash-icon ml-2" onclick="deleteTodo(<%=allTodos[i].id%>)">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                    </svg>
-                </a>
-            </div>
-        </li> 
-        <% } %>
-    <% } %>
-    <script>document.getElementById("count-completed").innerHTML = <%=countCompleted%></script>
 </ul>

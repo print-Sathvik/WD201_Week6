@@ -53,6 +53,7 @@
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
             <%- include('header.ejs') %>
+            <a href="/signout" class="text-green-600">Signout</a>
             <form action="/todos" method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                 <div class="flex gap-2 py-4">
@@ -68,7 +69,10 @@
                 </div>
             </form>
             <div>
-                <%- include('todos.ejs') %>
+                <%- include('todos.ejs', {title: "Overdue", todos: overdue}) %>
+                <%- include('todos.ejs', {title: "Due Today", todos: dueToday}) %>
+                <%- include('todos.ejs', {title: "Due Later", todos: dueLater}) %>
+                <%- include('todos.ejs', {title: "Completed Items", todos: completed}) %>
             </div>
         </div>
     </div>
