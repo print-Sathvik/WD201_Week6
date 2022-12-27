@@ -12,6 +12,16 @@ function extractCsrfToken(res) {
   return $("[name=_csrf]").val();
 }
 
+const login = async (agent, username, password) => {
+  let res = await agent.get("/login");
+  let csrfToken = extractCsrfToken(res);
+  res = await agent.post("/session").send({
+    email: username,
+    password: password,
+    _csrf: csrfToken,
+  });
+};
+
 describe("Todo Application", function () {
   beforeAll(async () => {
     await db.sequelize.sync({ force: true });
@@ -41,7 +51,18 @@ describe("Todo Application", function () {
     expect(res.statusCode).toBe(302);
   });
 
+  test("Sign out", async () => {
+    let response = await agent.get("/todos");
+    expect(response.statusCode).toBe(200);
+    response = await agent.get("/signout");
+    expect(response.statusCode).toBe(302);
+    response = await agent.get("/todos");
+    expect(response.statusCode).toBe(302);
+  });
+
   test("Creates a todo at /todos POST endpoint", async () => {
+    const agent = request.agent(server);
+    await login(agent, "testuser@testmail.com", "testpassword123");
     let res = await agent.get("/todos");
     let csrfToken = extractCsrfToken(res);
     const response = await agent.post("/todos").send({
@@ -53,7 +74,9 @@ describe("Todo Application", function () {
     expect(response.statusCode).toBe(302);
   });
 
-  test("Marks a todo with the given ID as complete", async () => {
+  test("Marks a todo as COMPLETE and then marking the same as INCOMPLETE", async () => {
+    const agent = request.agent(server);
+    await login(agent, "testuser@testmail.com", "testpassword123");
     let res = await agent.get("/todos");
     let csrfToken = extractCsrfToken(res);
     const response = await agent
@@ -80,19 +103,29 @@ describe("Todo Application", function () {
     res = await agent.get("/todos");
     csrfToken = extractCsrfToken(res);
 
-    const markCompleteResponse = await agent.put(`/todos/${todoID}`).send({
+    await agent.put(`/todos/${todoID}`).send({
       completed: true,
       _csrf: csrfToken,
     });
-    // eslint-disable-next-line no-unused-vars
-    const parsedUpdateResponse = JSON.parse(markCompleteResponse.text);
-    //expect(parsedUpdateResponse.completed).toBe(true);
-    const todo = await Todo.findByPk(todoID);
+    let todo = await Todo.findByPk(todoID);
     expect(todo.completed).toBe(true);
+
+    //Marking the same todo as incomplete
+    res = await agent.get("/todos");
+    csrfToken = extractCsrfToken(res);
+
+    await agent.put(`/todos/${todoID}`).send({
+      completed: false,
+      _csrf: csrfToken,
+    });
+    todo = await Todo.findByPk(todoID);
+    expect(todo.completed).toBe(false);
   });
 
   test("Deletes a todo if it exists and sends a boolean response", async () => {
     // FILL IN YOUR CODE HERE
+    const agent = request.agent(server);
+    await login(agent, "testuser@testmail.com", "testpassword123");
     let res = await agent.get("/todos");
     let csrfToken = extractCsrfToken(res);
     const response = await agent
