@@ -8,6 +8,7 @@ var cookieParser = require("cookie-parser");
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
+const flash = require("connect-flash");
 const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
 
@@ -26,6 +27,7 @@ app.set("view engine", "ejs");
 
 //Location of static html and CSS files to render our application
 app.use(express.static(path.join(__dirname, "public")));
+app.set("views", path.join(__dirname, "views"));
 
 app.use(
   session({
@@ -38,6 +40,7 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
 passport.use(
   new LocalStrategy(
@@ -47,16 +50,16 @@ passport.use(
     },
     (username, password, done) => {
       User.findOne({ where: { email: username } })
-        .then(async (user) => {
+        .then(async function (user) {
           const result = await bcrypt.compare(password, user.password);
           if (result) {
             return done(null, user);
           } else {
-            return done("Invalid Password");
+            return done(null, false, { message: "Invalid password" });
           }
         })
         .catch((error) => {
-          return error;
+          return done(error);
         });
     }
   )
@@ -75,6 +78,11 @@ passport.deserializeUser((id, done) => {
     .catch((error) => {
       done(error, null);
     });
+});
+
+app.use(function (request, response, next) {
+  response.locals.messages = request.flash();
+  next();
 });
 
 app.get("/", async (request, response) => {
@@ -122,6 +130,22 @@ app.get("/signup", async (request, response) => {
 });
 
 app.post("/users", async (request, response) => {
+  //I used trim() so that empty strings of any length are counted as 0 only
+  //even empty strings are not allowed.
+  //I put restrictions on firstname, email and password only
+  //Last name is optional.
+  if (request.body.firstName.trim().length === 0) {
+    request.flash("error", "First name is mandatory");
+    return response.redirect("/signup");
+  }
+  if (request.body.email.trim().length === 0) {
+    request.flash("error", "Email ID is a mandatory field");
+    return response.redirect("/signup");
+  }
+  if (request.body.password.length < 5) {
+    request.flash("error", "Password should be of atleast 5 characters");
+    return response.redirect("/signup");
+  }
   const hashedPassword = await bcrypt.hash(request.body.password, saltRounds);
   console.log(hashedPassword);
   try {
@@ -151,8 +175,11 @@ app.get("/login", (request, response) => {
 
 app.post(
   "/session",
-  passport.authenticate("local", { failureRedirect: "/login" }),
-  (request, response) => {
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
+  function (request, response) {
     console.log(request.user);
     response.redirect("/todos");
   }
@@ -197,6 +224,14 @@ app.post(
   "/todos",
   connectEnsureLogin.ensureLoggedIn(),
   async function (request, response) {
+    if (request.body.title.trim().length === 0) {
+      request.flash("error", "Title cannot be empty");
+      return response.redirect("/todos");
+    }
+    if (request.body.title.trim().length < 5) {
+      request.flash("error", "Please enter a meaningful title");
+      return response.redirect("/todos");
+    }
     console.log(request.user);
     try {
       const todo = await Todo.addTodo({

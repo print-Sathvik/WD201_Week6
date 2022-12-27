@@ -11,6 +11,7 @@ module.exports = {
       },
       firstName: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       lastName: {
         type: Sequelize.STRING,
@@ -22,6 +23,7 @@ module.exports = {
       },
       password: {
         type: Sequelize.STRING,
+        allowNull: flase,
       },
       createdAt: {
         allowNull: false,
