@@ -58,8 +58,9 @@ passport.use(
             return done(null, false, { message: "Invalid password" });
           }
         })
-        .catch((error) => {
-          return done(error);
+        .catch(() => {
+          //Changed this flash message for resubmission. It's working properly now.
+          return done(null, false, { message: "User does not exist" });
         });
     }
   )
@@ -158,11 +159,14 @@ app.post("/users", async (request, response) => {
     request.login(user, (err) => {
       if (err) {
         console.log(err);
+        response.redirect("/signup");
       }
       response.redirect("/todos");
     });
   } catch (error) {
     console.log(error);
+    request.flash("error", "User already exits. Please Login");
+    response.redirect("/login");
   }
 });
 
