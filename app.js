@@ -1,5 +1,4 @@
 const express = require("express");
-var csrf = require("tiny-csrf");
 const app = express();
 const { Todo, User } = require("./models");
 const bodyParser = require("body-parser");
@@ -10,7 +9,7 @@ const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 const flash = require("connect-flash");
 const LocalStrategy = require("passport-local");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 const saltRounds = 10;
 
@@ -20,7 +19,7 @@ const path = require("path");
 const { response } = require("express");
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser("A secret string"));
-app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
+// app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 
 //Setting EJS as view engine
 app.set("view engine", "ejs");
@@ -89,7 +88,7 @@ app.use(function (request, response, next) {
 app.get("/", async (request, response) => {
   response.render("index", {
     title: "Todo Application",
-    csrfToken: request.csrfToken(),
+    csrfToken: "", // request.csrfToken(),,
   });
 });
 
@@ -110,7 +109,7 @@ app.get(
         dueToday,
         dueLater,
         completed,
-        csrfToken: request.csrfToken(),
+        csrfToken: "", // request.csrfToken(),,
       });
     } else {
       response.json({
@@ -126,7 +125,7 @@ app.get(
 app.get("/signup", async (request, response) => {
   response.render("signup", {
     title: "Signup",
-    csrfToken: request.csrfToken(),
+    csrfToken: "", // request.csrfToken(),,
   });
 });
 
@@ -173,7 +172,7 @@ app.post("/users", async (request, response) => {
 app.get("/login", (request, response) => {
   response.render("login", {
     title: "Login",
-    csrfToken: request.csrfToken(),
+    csrfToken: "", // request.csrfToken(),,
   });
 });
 
