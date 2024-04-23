@@ -1,10 +1,10 @@
-version: '3.8'
+version: "3.8"
 services:
   app:
     build:
       context: .
       target: dev
-    image:  todo:development
+    image: todo:development
     volumes:
       - .:/app
     ports:
@@ -14,7 +14,6 @@ services:
     network_mode: bridge
     depends_on:
       - postgres
-
 
   postgres:
     container_name: postgres
