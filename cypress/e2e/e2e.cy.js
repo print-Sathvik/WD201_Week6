@@ -1,11 +1,37 @@
 /* eslint-disable no-undef */
+function toIsoString(date) {
+  var tzo = -date.getTimezoneOffset(),
+    dif = tzo >= 0 ? "+" : "-",
+    pad = function (num) {
+      return (num < 10 ? "0" : "") + num;
+    };
+
+  return (
+    date.getFullYear() +
+    "-" +
+    pad(date.getMonth() + 1) +
+    "-" +
+    pad(date.getDate()) +
+    "T" +
+    pad(date.getHours()) +
+    ":" +
+    pad(date.getMinutes()) +
+    ":" +
+    pad(date.getSeconds()) +
+    dif +
+    pad(Math.floor(Math.abs(tzo) / 60)) +
+    ":" +
+    pad(Math.abs(tzo) % 60)
+  );
+}
+
 describe("Testing Election Site", () => {
   beforeEach(() => {
     cy.session("Signup Session", () => {
       cy.visit("/signup");
-      cy.visit("/login");
-      // cy.get("input[name='firstName']").type('First');
-      // cy.get("input[name='lastName']").type('last');
+      // cy.visit("/login");
+      cy.get("input[name='firstName']").type("First");
+      cy.get("input[name='lastName']").type("last");
       cy.get("input[name='email']").type("org1@test.com");
       cy.get("input[name='password']").type("testpassword");
       cy.get("button[type='submit']").click();
@@ -56,7 +82,7 @@ describe("Testing Election Site", () => {
   });
 
   it("Create Today's Todo", () => {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = toIsoString(new Date()).slice(0, 10);
     cy.visit("/todos");
     let prev_count;
     cy.get("h3[id='count-duetoday']")
@@ -64,7 +90,7 @@ describe("Testing Election Site", () => {
       .then((text) => {
         prev_count = parseInt(text);
       });
-    cy.get("input[name='title']").type("Start capstone project");
+    cy.get("input[name='title']").type("Solve Leetcode daily question");
     cy.get("input[type='date']").type(today);
     cy.get("button[type='submit']").click();
     cy.contains("Start capstone project");

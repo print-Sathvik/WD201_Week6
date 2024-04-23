@@ -11,7 +11,7 @@
     "test": "NODE_ENV=test jest --detectOpenHandles",
     "prepare": "husky install",
     "test:node": "NODE_ENV=test jest --detectOpenHandles",
-    "cypress": "npx cypress run --headed --no-exit",
+    "cypress": "npx cypress run",
     "clean:start": "npm run pretest && NODE_ENV=test npm start"
   },
   "lint-staged": {
