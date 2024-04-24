@@ -23,10 +23,13 @@
   "author": "Sathvik <satvikreddy2017@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "@sentry/node": "^7.112.1",
+    "@sentry/profiling-node": "^7.112.1",
     "bcryptjs": "^2.4.3",
     "connect-ensure-login": "^0.1.1",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
     "ejs": "^3.1.8",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
