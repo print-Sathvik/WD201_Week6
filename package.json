@@ -7,9 +7,12 @@
     "start": "nodemon -e js,ejs",
     "start:prod": "node index.js",
     "db:create:test": "NODE_ENV=test npx sequelize-cli db:create",
-    "pretest": "NODE_ENV=test npx sequelize-cli db:drop && NODE_ENV=test npx sequelize-cli db:create",
+    "pretest": "NODE_ENV=test npx sequelize-cli db:drop && NODE_ENV=test npx sequelize-cli db:create  && NODE_ENV=test npx sequelize-cli db:migrate",
     "test": "NODE_ENV=test jest --detectOpenHandles",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test:node": "NODE_ENV=test jest --detectOpenHandles",
+    "cypress": "npx cypress run",
+    "clean:start": "npm run pretest && NODE_ENV=test npm start"
   },
   "lint-staged": {
     "*.js": [
@@ -20,10 +23,13 @@
   "author": "Sathvik <satvikreddy2017@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.1.0",
+    "@sentry/node": "^7.112.1",
+    "@sentry/profiling-node": "^7.112.1",
+    "bcryptjs": "^2.4.3",
     "connect-ensure-login": "^0.1.1",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
     "ejs": "^3.1.8",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
@@ -37,11 +43,12 @@
   },
   "devDependencies": {
     "cheerio": "^1.0.0-rc.12",
+    "cypress": "^13.7.2",
     "eslint": "^8.30.0",
     "husky": "^8.0.2",
     "jest": "^29.3.1",
     "lint-staged": "^13.1.0",
-    "nodemon": "^2.0.20",
+    "nodemon": "^3.1.0",
     "prettier": "^2.8.1",
     "sequelize-cli": "^6.5.2",
     "supertest": "^6.3.3"
